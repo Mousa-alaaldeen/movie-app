@@ -61,7 +61,7 @@ class SearchScreen extends GetView<SearchControllerr> {
                                   .toString(),
                               originalTitle:
                                   controller.SearchList[index].originalTitle!,
-                              overview: controller.SearchList[index].overview!,
+                              overview: controller.SearchList[index].overview!, onRatingUpdate: (double ) {  },
                             ));
                           },
                           child: Row(

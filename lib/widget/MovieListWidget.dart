@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, file_names
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, file_names, avoid_print, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
 import 'package:mov/controller/home_controller.dart';
@@ -133,6 +133,24 @@ class MovieListWidget extends StatelessWidget {
                               year: list[index].releaseDate!.toString(),
                               originalTitle: list[index].originalTitle!,
                               overview: list[index].overview!,
+                              onRatingUpdate: (rating) {
+                                Get.find<HomeController>().setRate(
+                                    movieId: list[index].id!, value: rating);
+
+                                print('تم تعيين التقييم بنجاح: $rating');
+                              },
+                              initialRating: list[index].voteAverage,
+                              deleteRate: () async {
+                                try {
+                                  await Get.find<HomeController>().deleteRate(
+                                    movieId: list[index].id!,
+                                  );
+
+                                  print('تم حذف التقييم بنجاح');
+                                } catch (error) {
+                                  print('حدث خطأ أثناء حذف التقييم: $error');
+                                }
+                              },
                             ));
                           },
                         );

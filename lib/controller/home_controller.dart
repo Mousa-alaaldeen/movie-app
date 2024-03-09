@@ -1,11 +1,13 @@
-// ignore_for_file: unnecessary_string_interpolations, avoid_print, depend_on_referenced_packages
+// ignore_for_file: unnecessary_string_interpolations, avoid_print, depend_on_referenced_packages, prefer_const_declarations
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mov/model/model.dart';
 import 'package:dio/dio.dart';
 import 'package:mov/util/api_url.dart';
+import 'dart:convert';
 import 'package:mov/util/constants.dart';
+import 'package:mov/util/error_dialog.dart';
 
 class HomeBinding extends Bindings {
   @override
@@ -15,6 +17,18 @@ class HomeBinding extends Bindings {
 }
 
 class HomeController extends GetxController {
+  late AnimationController animationController;
+  late Animation<Offset> animation;
+  List<dynamic>? results;
+  List<Results> list = [];
+  List<Results> nowPlayingList = [];
+  List<Results> upcomingList = [];
+  List<Results> tVList = [];
+  List<String> tVImage = [];
+  List<String> favoriteList = [];
+  List<Results> trendingList = [];
+  List<Record> ratedMovies = [];
+
   @override
   void onInit() {
     super.onInit();
@@ -24,24 +38,17 @@ class HomeController extends GetxController {
     getTVData();
   }
 
-  List<Results> upcomingList = [];
   void getupcomingData() async {
-    isLoding = true;
-    update();
     var response = await Dio().get("$upcoming");
     results = response.data['results'];
 
     for (var e in results!) {
       upcomingList.add(Results.fromJsonObjectModel(e));
     }
-    isLoding = false;
-    update();
   }
-
 //=========================================
-  List<Results> nowPlayingList = [];
+
   void getNowPlayingData() async {
-    update();
     var response = await Dio().get("$nowPlaying");
     results = response.data['results'];
     // print("Status Code: ${response.statusCode}");
@@ -50,52 +57,40 @@ class HomeController extends GetxController {
       nowPlayingList.add(Results.fromJsonObjectModel(e));
     }
     print(nowPlayingList);
-    isLoding = false;
-    update();
   }
 
 //==========================================
-  List<Results> tVList = [];
-  List<String> tVImage = [];
   void getTVData() async {
-    isLoding = true;
-    update();
     var response = await Dio().get("$tV");
     results = response.data['results'];
-
     for (var e in results!) {
       //https://image.tmdb.org/t/p/w500/${controller.upcomingList[index].posterPath}
       tVImage.add("https://image.tmdb.org/t/p/w500/${e['poster_path']}");
       tVList.add(Results.fromJsonObjectModel(e));
     }
-    isLoding = false;
-    update();
   }
 
-  bool isLoding = false;
-  List<Results> list = [];
-  late AnimationController animationController;
-  late Animation<Offset> animation;
-
-  List<dynamic>? results;
-  void getData() async {
-    isLoding = true;
+  void getData() {
     update();
-    var response = await Dio().get(
-        "https://api.themoviedb.org/3/discover/movie?api_key=7520ef7694f155dc2802d75ec51b5d4b");
-    results = response.data['results'];
-    // print(response);
-    for (var e in results!) {
-      list.add(Results.fromJsonObjectModel(e));
-    }
+    Dio()
+        .get(
+      "https://api.themoviedb.org/3/discover/movie?api_key=7520ef7694f155dc2802d75ec51b5d4b",
+    )
+        .then((response) {
+      print('sucsses');
 
-    isLoding = false;
-    update();
+      results = response.data['results'];
+      for (var e in results!) {
+        list.add(Results.fromJsonObjectModel(e));
+      }
+
+      update();
+    }).catchError((onError) {
+      Get.dialog(ErrorDialogWidget());
+    });
   }
 
-  List<Results> trendingList = [];
   void getTrendingData() async {
-    isLoding = true;
     update();
     var response = await Dio().get("$trending");
     results = response.data['results'];
@@ -104,7 +99,6 @@ class HomeController extends GetxController {
       trendingList.add(Results.fromJsonObjectModel(e));
     }
 
-    isLoding = false;
     update();
   }
 
@@ -112,7 +106,6 @@ class HomeController extends GetxController {
       {required int mediaId,
       required bool favorite,
       required String mediaType}) async {
-    isLoding = true;
     update();
 
     return await Dio()
@@ -129,7 +122,7 @@ class HomeController extends GetxController {
             }))
         .then((value) {
       print('sucsses');
-      isLoding = false;
+
       update();
     }).catchError((onError) {
       print(onError);
@@ -137,36 +130,42 @@ class HomeController extends GetxController {
   }
 
   Future setRate({required int movieId, required double value}) async {
-    isLoding = true;
     update();
 
+    final jsonData = json.encode({'value': value});
+
     return await Dio()
-        .post('${baseUrl}movie/$movieId/rating',
-            data: {'{"value":$value}'},
-            options: Options(headers: {
-              'Authorization': ' Bearer $token',
-              'Content-Type': 'application/json;charset=utf-',
-              'accept': 'application/json',
-            }))
+        .post(
+      '${baseUrl}movie/$movieId/rating',
+      data: jsonData,
+      options: Options(
+        headers: {
+          'Authorization': ' Bearer $token',
+          'Content-Type': 'application/json;charset=utf-',
+          'accept': 'application/json',
+        },
+      ),
+    )
         .then((value) {
       print('sucsses');
-      isLoding = false;
+
       update();
     }).catchError((onError) {
       print(onError);
-      Get.defaultDialog(
-        title: 'ata qga;lsd',
-        onConfirm: () {},
-      );
+      // Get.defaultDialog(
+      //   title: 'ata qga;lsd',
+      //   onConfirm: () {},
+      // );
     });
   }
 
-  Future deleteRate({required int movieId}) async {
-    isLoding = true;
+  Future deleteRate({
+    required int movieId,
+  }) async {
     update();
 
     return await Dio()
-        .post('${baseUrl}movie/$movieId/rating',
+        .delete('${baseUrl}movie/$movieId/rating',
             options: Options(headers: {
               'Authorization': ' Bearer $token',
               'Content-Type': 'application/json;charset=utf-',
@@ -174,7 +173,7 @@ class HomeController extends GetxController {
             }))
         .then((value) {
       print('sucsses');
-      isLoding = false;
+
       update();
     }).catchError((onError) {
       print(onError);

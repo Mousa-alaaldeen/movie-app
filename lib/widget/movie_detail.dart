@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mov/util/api_url.dart';
 import 'package:mov/util/constants.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class MovieDetailScreen extends StatelessWidget {
   const MovieDetailScreen({
@@ -14,13 +15,20 @@ class MovieDetailScreen extends StatelessWidget {
     required this.year,
     required this.originalTitle,
     required this.overview,
+    required this.onRatingUpdate,
+    this.deleteRate,
+    this.initialRating,
   });
   final String imageUrl;
   final String title;
   final String originalTitle;
   final String year;
   final int movieId;
+  final double? initialRating;
   final String overview;
+  final void Function(double) onRatingUpdate;
+  final Function()? deleteRate;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,6 +94,26 @@ class MovieDetailScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
+            ),
+          ),
+          Center(
+            child: RatingBar.builder(
+                initialRating: initialRating ?? 0,
+                minRating: 0.5,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 8,
+                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                itemBuilder: (context, _) => Icon(
+                      Icons.star,
+                      color: Colors.amber,
+                    ),
+                onRatingUpdate: onRatingUpdate),
+          ),
+          Center(
+            child: ElevatedButton(
+              onPressed: deleteRate,
+              child: Text("Delete rating"),
             ),
           ),
         ],

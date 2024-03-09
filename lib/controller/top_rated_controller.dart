@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mov/model/model.dart';
 import 'package:dio/dio.dart';
-import 'package:mov/util/api_url.dart';
 
 class TopRatedBindings extends Bindings {
   @override
@@ -36,7 +35,6 @@ class TopRatedController extends GetxController {
     for (var e in results!) {
       list.add(Results.fromJsonObjectModel(e));
     }
-
     isLoding = false;
     update();
   }

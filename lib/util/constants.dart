@@ -18,6 +18,7 @@ const kHeadingextStyle = TextStyle(
 const kSubheadingextStyle = TextStyle(
     fontSize: 24,
     color: kTextColor,
+    fontWeight: FontWeight.bold,
     height: 2,
     fontFamily: "Poppins",
     decoration: TextDecoration.none);

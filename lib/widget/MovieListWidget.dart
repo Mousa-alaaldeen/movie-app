@@ -1,18 +1,24 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, file_names
 
 import 'package:flutter/material.dart';
+import 'package:mov/controller/home_controller.dart';
 import 'package:mov/model/model.dart';
 import 'package:mov/util/constants.dart';
+import 'package:get/get.dart';
+import 'package:mov/widget/movie_detail.dart';
 
 class MovieListWidget extends StatelessWidget {
-  final List<Results> moviesList;
   final String text1;
   final String text2;
+  final List<Results> list;
+  final Function()? onPressedFav;
+
   const MovieListWidget(
       {Key? key,
-      required this.moviesList,
       required this.text1,
-      required this.text2})
+      required this.text2,
+      required this.list,
+      this.onPressedFav})
       : super(key: key);
 
   @override
@@ -39,14 +45,14 @@ class MovieListWidget extends StatelessWidget {
           SizedBox(
             height: 15,
           ),
-          moviesList.isEmpty
+          list.isEmpty
               ? CircularProgressIndicator()
               : Expanded(
                   child: Align(
                     alignment: Alignment.center,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: moviesList.length,
+                      itemCount: list.length,
                       itemBuilder: (context, index) {
                         return InkWell(
                           child: AspectRatio(
@@ -61,7 +67,7 @@ class MovieListWidget extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(20),
                                       image: DecorationImage(
                                           image: NetworkImage(
-                                        'https://image.tmdb.org/t/p/w500/${moviesList[index].posterPath}',
+                                        'https://image.tmdb.org/t/p/original/${list[index].posterPath}',
                                       ))),
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -85,15 +91,24 @@ class MovieListWidget extends StatelessWidget {
                                         children: <Widget>[
                                           Align(
                                             alignment: Alignment.topRight,
-                                            child: Icon(
-                                              Icons.favorite,
-                                              color: Colors.white,
-                                              size: 20,
+                                            child: IconButton(
+                                              onPressed: () {
+                                                Get.find<HomeController>()
+                                                    .setFavorite(
+                                                  mediaId: list[index].id!,
+                                                  favorite: true,
+                                                  mediaType: 'movie',
+                                                );
+                                              },
+                                              icon: Icon(
+                                                Icons.favorite,
+                                                color: Colors.white,
+                                                size: 20,
+                                              ),
                                             ),
                                           ),
                                           Text(
-                                            moviesList[index].originalTitle ??
-                                                "",
+                                            list[index].originalTitle ?? "",
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 14),
@@ -111,10 +126,14 @@ class MovieListWidget extends StatelessWidget {
                             ),
                           ),
                           onTap: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(builder: (context) => MovieScreen()),
-                            // );
+                            Get.to(MovieDetailScreen(
+                              movieId: list[index].id!,
+                              imageUrl: list[index].backdropPath!,
+                              title: list[index].originalTitle!,
+                              year: list[index].releaseDate!.toString(),
+                              originalTitle: list[index].originalTitle!,
+                              overview: list[index].overview!,
+                            ));
                           },
                         );
                       },

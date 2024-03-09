@@ -1,13 +1,15 @@
+// ignore_for_file: unnecessary_getters_setters
+
 class TranslationsModel {
   int? _id;
   List<Translations>? _translations;
 
   TranslationsModel({int? id, List<Translations>? translations}) {
     if (id != null) {
-      this._id = id;
+      _id = id;
     }
     if (translations != null) {
-      this._translations = translations;
+      _translations = translations;
     }
   }
 
@@ -22,17 +24,16 @@ class TranslationsModel {
     if (json['translations'] != null) {
       _translations = <Translations>[];
       json['translations'].forEach((v) {
-        _translations!.add(new Translations.fromJson(v));
+        _translations!.add(Translations.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this._id;
-    if (this._translations != null) {
-      data['translations'] =
-          this._translations!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = _id;
+    if (_translations != null) {
+      data['translations'] = _translations!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -52,19 +53,19 @@ class Translations {
       String? englishName,
       Data? data}) {
     if (iso31661 != null) {
-      this._iso31661 = iso31661;
+      _iso31661 = iso31661;
     }
     if (iso6391 != null) {
-      this._iso6391 = iso6391;
+      _iso6391 = iso6391;
     }
     if (name != null) {
-      this._name = name;
+      _name = name;
     }
     if (englishName != null) {
-      this._englishName = englishName;
+      _englishName = englishName;
     }
     if (data != null) {
-      this._data = data;
+      _data = data;
     }
   }
 
@@ -84,17 +85,17 @@ class Translations {
     _iso6391 = json['iso_639_1'];
     _name = json['name'];
     _englishName = json['english_name'];
-    _data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    _data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['iso_3166_1'] = this._iso31661;
-    data['iso_639_1'] = this._iso6391;
-    data['name'] = this._name;
-    data['english_name'] = this._englishName;
-    if (this._data != null) {
-      data['data'] = this._data!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['iso_3166_1'] = _iso31661;
+    data['iso_639_1'] = _iso6391;
+    data['name'] = _name;
+    data['english_name'] = _englishName;
+    if (_data != null) {
+      data['data'] = _data!.toJson();
     }
     return data;
   }
@@ -114,19 +115,19 @@ class Data {
       String? tagline,
       String? title}) {
     if (homepage != null) {
-      this._homepage = homepage;
+      _homepage = homepage;
     }
     if (overview != null) {
-      this._overview = overview;
+      _overview = overview;
     }
     if (runtime != null) {
-      this._runtime = runtime;
+      _runtime = runtime;
     }
     if (tagline != null) {
-      this._tagline = tagline;
+      _tagline = tagline;
     }
     if (title != null) {
-      this._title = title;
+      _title = title;
     }
   }
 
@@ -150,12 +151,12 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['homepage'] = this._homepage;
-    data['overview'] = this._overview;
-    data['runtime'] = this._runtime;
-    data['tagline'] = this._tagline;
-    data['title'] = this._title;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['homepage'] = _homepage;
+    data['overview'] = _overview;
+    data['runtime'] = _runtime;
+    data['tagline'] = _tagline;
+    data['title'] = _title;
     return data;
   }
 }

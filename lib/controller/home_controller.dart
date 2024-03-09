@@ -1,10 +1,11 @@
-// ignore_for_file: unnecessary_string_interpolations, avoid_print
+// ignore_for_file: unnecessary_string_interpolations, avoid_print, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mov/model/model.dart';
 import 'package:dio/dio.dart';
 import 'package:mov/util/api_url.dart';
+import 'package:mov/util/constants.dart';
 
 class HomeBinding extends Bindings {
   @override
@@ -29,7 +30,7 @@ class HomeController extends GetxController {
     update();
     var response = await Dio().get("$upcoming");
     results = response.data['results'];
-    print(response);
+
     for (var e in results!) {
       upcomingList.add(Results.fromJsonObjectModel(e));
     }
@@ -43,7 +44,8 @@ class HomeController extends GetxController {
     update();
     var response = await Dio().get("$nowPlaying");
     results = response.data['results'];
-    print(response);
+    // print("Status Code: ${response.statusCode}");
+
     for (var e in results!) {
       nowPlayingList.add(Results.fromJsonObjectModel(e));
     }
@@ -60,10 +62,10 @@ class HomeController extends GetxController {
     update();
     var response = await Dio().get("$tV");
     results = response.data['results'];
-    print(response);
+
     for (var e in results!) {
       //https://image.tmdb.org/t/p/w500/${controller.upcomingList[index].posterPath}
-      tVImage.add("https://image.tmdb.org/t/p/w500/${e['poster_path']}"   );
+      tVImage.add("https://image.tmdb.org/t/p/w500/${e['poster_path']}");
       tVList.add(Results.fromJsonObjectModel(e));
     }
     isLoding = false;
@@ -97,12 +99,85 @@ class HomeController extends GetxController {
     update();
     var response = await Dio().get("$trending");
     results = response.data['results'];
-    print(response);
+
     for (var e in results!) {
       trendingList.add(Results.fromJsonObjectModel(e));
     }
 
     isLoding = false;
     update();
+  }
+
+  Future setFavorite(
+      {required int mediaId,
+      required bool favorite,
+      required String mediaType}) async {
+    isLoding = true;
+    update();
+
+    return await Dio()
+        .post('${baseUrl}account/21073642/favorite',
+            data: {
+              "media_type": mediaType,
+              "media_id": mediaId,
+              "favorite": favorite
+            },
+            options: Options(headers: {
+              'Authorization': ' Bearer $token',
+              'accept': 'application/json',
+              'content-type': 'application/json',
+            }))
+        .then((value) {
+      print('sucsses');
+      isLoding = false;
+      update();
+    }).catchError((onError) {
+      print(onError);
+    });
+  }
+
+  Future setRate({required int movieId, required double value}) async {
+    isLoding = true;
+    update();
+
+    return await Dio()
+        .post('${baseUrl}movie/$movieId/rating',
+            data: {'{"value":$value}'},
+            options: Options(headers: {
+              'Authorization': ' Bearer $token',
+              'Content-Type': 'application/json;charset=utf-',
+              'accept': 'application/json',
+            }))
+        .then((value) {
+      print('sucsses');
+      isLoding = false;
+      update();
+    }).catchError((onError) {
+      print(onError);
+      Get.defaultDialog(
+        title: 'ata qga;lsd',
+        onConfirm: () {},
+      );
+    });
+  }
+
+  Future deleteRate({required int movieId}) async {
+    isLoding = true;
+    update();
+
+    return await Dio()
+        .post('${baseUrl}movie/$movieId/rating',
+            options: Options(headers: {
+              'Authorization': ' Bearer $token',
+              'Content-Type': 'application/json;charset=utf-',
+              'accept': 'application/json',
+            }))
+        .then((value) {
+      print('sucsses');
+      isLoding = false;
+      update();
+    }).catchError((onError) {
+      print(onError);
+    });
   }
 }

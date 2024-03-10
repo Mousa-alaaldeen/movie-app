@@ -1,4 +1,4 @@
-# mov
+# movie app
 
 A new Flutter project.
 

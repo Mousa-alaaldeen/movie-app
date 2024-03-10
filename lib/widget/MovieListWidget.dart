@@ -100,18 +100,25 @@ class MovieListWidget extends StatelessWidget {
                                                   mediaType: 'movie',
                                                 );
                                               },
-                                              icon: Icon(
-                                                Icons.favorite,
-                                                color: Colors.white,
-                                                size: 20,
+                                              icon: CircleAvatar(
+                                                radius: 15,
+                                                // backgroundColor: Get.find<HomeController>().favorites[list]?,
+                                                child: Icon(
+                                                  Icons.favorite,
+                                                  color: Colors.white,
+                                                  size: 20,
+                                                ),
                                               ),
                                             ),
                                           ),
                                           Text(
                                             list[index].originalTitle ?? "",
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14),
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                            ),
                                           )
                                         ],
                                       ),
@@ -127,6 +134,7 @@ class MovieListWidget extends StatelessWidget {
                           ),
                           onTap: () {
                             Get.to(MovieDetailScreen(
+                              voteCount: list[index].voteCount.toString(),
                               movieId: list[index].id!,
                               imageUrl: list[index].backdropPath!,
                               title: list[index].originalTitle!,
@@ -135,7 +143,7 @@ class MovieListWidget extends StatelessWidget {
                               overview: list[index].overview!,
                               onRatingUpdate: (rating) {
                                 Get.find<HomeController>().setRate(
-                                    movieId: list[index].id!, value: rating);
+                                    movieId: list[index].id!, val: rating);
 
                                 print('تم تعيين التقييم بنجاح: $rating');
                               },

@@ -3,11 +3,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
 import 'package:get/get.dart';
 import 'package:mov/controller/home_controller.dart';
 import 'package:mov/controller/search_controller.dart';
-import 'package:mov/controller/test_controller.dart';
 import 'package:mov/util/api_url.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mov/util/constants.dart';
@@ -52,6 +50,18 @@ class SearchScreen extends GetView<SearchControllerr> {
                           onTap: () {
                             // print('00');
                             Get.to(MovieDetailScreen(
+                              deleteRate: () async {
+                                try {
+                                  await Get.find<HomeController>().deleteRate(
+                                    movieId: controller.SearchList[index].id!,
+                                  );
+                                  print('تم حذف التقييم بنجاح');
+                                } catch (error) {
+                                  print('حدث خطأ أثناء حذف التقييم: $error');
+                                }
+                              },
+                              voteCount: controller.SearchList[index].voteCount
+                                  .toString(),
                               movieId: controller.SearchList[index].id!,
                               imageUrl:
                                   controller.SearchList[index].backdropPath!,
@@ -61,7 +71,14 @@ class SearchScreen extends GetView<SearchControllerr> {
                                   .toString(),
                               originalTitle:
                                   controller.SearchList[index].originalTitle!,
-                              overview: controller.SearchList[index].overview!, onRatingUpdate: (double ) {  },
+                              overview: controller.SearchList[index].overview!,
+                              onRatingUpdate: (rating) {
+                                Get.find<HomeController>().setRate(
+                                    movieId: controller.SearchList[index].id!,
+                                    val: rating);
+
+                                print('تم تعيين التقييم بنجاح: $rating');
+                              },
                             ));
                           },
                           child: Row(

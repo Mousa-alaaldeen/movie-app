@@ -14,4 +14,13 @@ class FavoriteBinding extends Bindings {
   }
 }
 
-class FavoriteController extends GetxController {}
+class FavoriteController extends GetxController {
+  List<Results> favoriteList = [];
+  List<dynamic>? results;
+  void onInit() {
+    super.onInit();
+    // fetchMovies();
+  }
+
+ 
+}

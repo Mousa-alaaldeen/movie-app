@@ -39,6 +39,7 @@ const kSubtitleTextSyule = TextStyle(
 
 const kBoldedSubtitleTextSyule = TextStyle(
     fontSize: 14,
+    height: 2,
     color: kTextColor,
     fontWeight: FontWeight.bold,
     fontFamily: "Poppins",

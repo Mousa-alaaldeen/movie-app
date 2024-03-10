@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_string_interpolations, avoid_print, depend_on_referenced_packages, prefer_const_declarations
+// ignore_for_file: unnecessary_string_interpolations, avoid_print, depend_on_referenced_packages, prefer_const_declarations, unnecessary_brace_in_string_interps
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,17 +25,19 @@ class HomeController extends GetxController {
   List<Results> upcomingList = [];
   List<Results> tVList = [];
   List<String> tVImage = [];
-  List<String> favoriteList = [];
+  List<Results> favoriteList = [];
   List<Results> trendingList = [];
   List<Record> ratedMovies = [];
 
   @override
   void onInit() {
     super.onInit();
-    getData();
-    getupcomingData();
-    getNowPlayingData();
+    getFavoriteMovies();
     getTVData();
+    getNowPlayingData();
+    getupcomingData();
+
+  getPopularData();
   }
 
   void getupcomingData() async {
@@ -61,20 +63,24 @@ class HomeController extends GetxController {
 
 //==========================================
   void getTVData() async {
-    var response = await Dio().get("$tV");
-    results = response.data['results'];
-    for (var e in results!) {
-      //https://image.tmdb.org/t/p/w500/${controller.upcomingList[index].posterPath}
-      tVImage.add("https://image.tmdb.org/t/p/w500/${e['poster_path']}");
-      tVList.add(Results.fromJsonObjectModel(e));
-    }
+    var response = await Dio().get("$tV").then((response) {
+      results = response.data['results'];
+      for (var e in results!) {
+        //https://image.tmdb.org/t/p/w500/${controller.upcomingList[index].posterPath}
+        tVImage.add("https://image.tmdb.org/t/p/w500/${e['poster_path']}");
+        tVList.add(Results.fromJsonObjectModel(e));
+      }
+      update();
+    }).catchError((onError) {
+      Get.dialog(ErrorDialogWidget());
+    });
   }
 
-  void getData() {
+  void getPopularData() {
     update();
     Dio()
         .get(
-      "https://api.themoviedb.org/3/discover/movie?api_key=7520ef7694f155dc2802d75ec51b5d4b",
+      "${baseUrl}discover/movie${key}",
     )
         .then((response) {
       print('sucsses');
@@ -92,47 +98,72 @@ class HomeController extends GetxController {
 
   void getTrendingData() async {
     update();
-    var response = await Dio().get("$trending");
-    results = response.data['results'];
+    Dio().get("$trending").then((response) {
+      results = response.data['results'];
 
-    for (var e in results!) {
-      trendingList.add(Results.fromJsonObjectModel(e));
-    }
+      for (var e in results!) {
+        trendingList.add(Results.fromJsonObjectModel(e));
+      }
 
-    update();
+      update();
+    }).catchError((onError) {
+      Get.dialog(ErrorDialogWidget());
+    });
   }
 
-  Future setFavorite(
-      {required int mediaId,
-      required bool favorite,
-      required String mediaType}) async {
+  Future setFavorite({
+    required int mediaId,
+    required bool favorite,
+    required String mediaType,
+  }) async {
     update();
 
     return await Dio()
-        .post('${baseUrl}account/21073642/favorite',
-            data: {
-              "media_type": mediaType,
-              "media_id": mediaId,
-              "favorite": favorite
-            },
-            options: Options(headers: {
-              'Authorization': ' Bearer $token',
-              'accept': 'application/json',
-              'content-type': 'application/json',
-            }))
+        .post(
+      '${baseUrl}account/21073642/favorite',
+      data: {
+        "media_type": mediaType,
+        "media_id": mediaId,
+        "favorite": favorite
+      },
+      options: Options(
+        headers: {
+          'Authorization': ' Bearer $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      ),
+    )
         .then((value) {
-      print('sucsses');
+      if (favorite == true) {
+        Get.snackbar(
+          'Added',
+          'The movie has been successfully added to favorites!',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        getFavoriteMovies();
+      } else {
+        Get.snackbar(
+          'Removed',
+          'The movie has been successfully removed from favorites!',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+      update();
 
+      print('sucsses');
       update();
     }).catchError((onError) {
       print(onError);
     });
   }
 
-  Future setRate({required int movieId, required double value}) async {
+  Future setRate({required int movieId, required double val}) async {
     update();
 
-    final jsonData = json.encode({'value': value});
+    final jsonData = json.encode({'value': val});
 
     return await Dio()
         .post(
@@ -147,15 +178,24 @@ class HomeController extends GetxController {
       ),
     )
         .then((value) {
+      Get.snackbar(
+        'Rating Added',
+        'Rating added successfully! ${val}',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+
       print('sucsses');
 
       update();
     }).catchError((onError) {
       print(onError);
-      // Get.defaultDialog(
-      //   title: 'ata qga;lsd',
-      //   onConfirm: () {},
-      // );
+      Get.snackbar(
+        'Error',
+        'An error occurred while adding the rating',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     });
   }
 
@@ -173,10 +213,44 @@ class HomeController extends GetxController {
             }))
         .then((value) {
       print('sucsses');
+      Get.snackbar(
+        'Rating Deleted',
+        'Rating deleted successfully!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
 
       update();
     }).catchError((onError) {
-      print(onError);
+      Get.snackbar(
+        'Error',
+        'An error occurred while deleting the rating.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    });
+  }
+
+  Future getFavoriteMovies() {
+    favoriteList = [];
+    return Dio()
+        .get('${baseUrl}account/21073642/favorite/movies',
+            options: Options(headers: {
+              'Authorization': ' Bearer $token',
+              'accept': 'application/json',
+              'content-type': 'application/json',
+            }))
+        .then((response) {
+      print('00000000000000000000000000000000');
+      results = response.data['results'];
+
+      print('Request failed with status: ${response.statusCode}');
+      for (var e in results!) {
+        favoriteList.add(Results.fromJsonObjectModel(e));
+      }
+    }).catchError((error) {
+      print('Request failed with status: ${error.statusCode}');
+      Get.dialog(ErrorDialogWidget());
     });
   }
 }

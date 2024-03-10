@@ -20,13 +20,18 @@ class CustomCarouselSlider extends GetView<HomeController> {
           : SizedBox(
               width: Get.width,
               height: (Get.height * 0.33 < 300) ? 300 : Get.height * 0.33,
-              child: FanCarouselImageSlider(
-                imageRadius: 30,
-                sliderHeight: 250,
-                imageFitMode: BoxFit.fill,
-                imagesLink: controller.tVImage,
-                showIndicator: false,
-                isAssets: false,
+              child: Stack(
+                children: [
+                  FanCarouselImageSlider(
+                    imageRadius: 30,
+                    sliderHeight: 250,
+                    imageFitMode: BoxFit.fill,
+                    imagesLink: controller.tVImage,
+                    showIndicator: false,
+                    isAssets: false,
+                    isClickable: false,
+                  ),
+                ],
               ),
             );
     });

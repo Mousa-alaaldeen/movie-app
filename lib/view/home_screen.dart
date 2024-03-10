@@ -3,11 +3,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mov/controller/search_controller.dart';
-import 'package:mov/util/api_url.dart';
 import 'package:mov/util/constants.dart';
-
 import 'package:mov/controller/home_controller.dart';
-
 import 'package:get/get.dart';
 import 'package:mov/view/search_screen.dart';
 import 'package:mov/widget/MovieListWidget.dart';
@@ -34,6 +31,14 @@ class HomeScreen extends GetView<HomeController> {
                 SizedBox(
                   height: 30,
                 ),
+                Center(
+                  child: Text("TV",
+                      style: TextStyle(
+                        color: kRedColor,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ),
                 CustomCarouselSlider(),
                 MovieListWidget(
                   text1: 'N',
@@ -52,7 +57,7 @@ class HomeScreen extends GetView<HomeController> {
                 MovieListWidget(
                   text1: 'P',
                   text2: 'opular',
-                  list: controller.upcomingList,
+                  list: controller.list,
                 ),
               ],
             ),

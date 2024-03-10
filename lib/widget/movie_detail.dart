@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mov/controller/home_controller.dart';
 import 'package:mov/util/api_url.dart';
 import 'package:mov/util/constants.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -16,24 +17,29 @@ class MovieDetailScreen extends StatelessWidget {
     required this.originalTitle,
     required this.overview,
     required this.onRatingUpdate,
-    this.deleteRate,
+    required this.deleteRate,
     this.initialRating,
+    required this.voteCount,
   });
   final String imageUrl;
   final String title;
   final String originalTitle;
   final String year;
+  final String voteCount;
   final int movieId;
   final double? initialRating;
   final String overview;
   final void Function(double) onRatingUpdate;
-  final Function()? deleteRate;
+  final Function() deleteRate;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
+          SizedBox(
+            height: 10,
+          ),
           Container(
             height: Get.height * 0.4,
             decoration: BoxDecoration(
@@ -52,23 +58,74 @@ class MovieDetailScreen extends StatelessWidget {
                     onPressed: () {
                       Get.back();
                     },
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
+                    icon: CircleAvatar(
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
+                      ),
                     ))
               ],
             )),
           ),
+          Center(
+            child: Text(
+              title,
+              style: kSubheadingextStyle,
+            ),
+          ),
+          SizedBox(
+            height: 30,
+          ),
           Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: kSubheadingextStyle,
+                Row(
+                  children: [
+                    RatingBar.builder(
+                      initialRating: initialRating ?? 0,
+                      minRating: 0.5,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 8,
+                      itemSize: 20,
+                      itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                      itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        size: 15,
+                        color: Colors.amber,
+                      ),
+                      onRatingUpdate: onRatingUpdate,
+                    ),
+                    Spacer(),
+                    IconButton(
+                      onPressed: () {
+                        Get.find<HomeController>().setFavorite(
+                          mediaId: movieId,
+                          favorite: true,
+                          mediaType: 'movie',
+                        );
+                      },
+                      icon: CircleAvatar(
+                        radius: 15,
+                        // backgroundColor: Get.find<HomeController>().favorites[list]?,
+                        child: Icon(
+                          Icons.favorite,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(
-                  height: 15,
+                SizedBox(width: 10),
+                TextButton(
+                  onPressed: deleteRate,
+                  child: Text(
+                    "Delete rating",
+                    style: TextStyle(fontSize: 14),
+                  ),
                 ),
                 Row(
                   children: [
@@ -83,6 +140,12 @@ class MovieDetailScreen extends StatelessWidget {
                       originalTitle,
                       style: kSubtitleTextSyule,
                     ),
+                    Spacer(),
+                    Text("vote Count"),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(voteCount.toString()),
                   ],
                 ),
                 SizedBox(
@@ -94,26 +157,6 @@ class MovieDetailScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
-            ),
-          ),
-          Center(
-            child: RatingBar.builder(
-                initialRating: initialRating ?? 0,
-                minRating: 0.5,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                itemCount: 8,
-                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                itemBuilder: (context, _) => Icon(
-                      Icons.star,
-                      color: Colors.amber,
-                    ),
-                onRatingUpdate: onRatingUpdate),
-          ),
-          Center(
-            child: ElevatedButton(
-              onPressed: deleteRate,
-              child: Text("Delete rating"),
             ),
           ),
         ],

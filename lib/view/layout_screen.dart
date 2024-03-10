@@ -2,7 +2,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:mov/controller/layout_controller.dart';
-import 'package:mov/view/home_screen.dart';
 
 class LayoutScreen extends GetView<LayoutControllerr> {
   const LayoutScreen({Key? key}) : super(key: key);

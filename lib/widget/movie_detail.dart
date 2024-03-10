@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, unnecessary_string_interpolations
+// ignore_for_file: prefer_const_constructors, unnecessary_string_interpolations, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
